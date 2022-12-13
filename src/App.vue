@@ -1,37 +1,136 @@
+<script>
+import chatBoxVue from './components/chatBox.vue';
+import messageVue from './components/messageChat.vue';
+
+export default {
+  name: 'App',
+  // Here we register the components which
+  // we are going to use in the template
+  components: {
+    registerDialog,
+    chatBox,
+    messageChat
+  },
+  // This is going to be called 
+  //  when the component gets rendered
+  created() {
+    this.getChat();
+  },
+  methods: {
+    onRegister(event, name) {
+      event.preventDefault();
+    // Authentication is out of scope for this project
+    // so we just generate a uuid
+    this.user = { name, id: uid() };
+    },
+    getChat() {
+      listenChat((chat) => {
+        this.messages = chat.reverse().map(m => ({
+          ...m,
+          isMine: m.uid && m.uid === this.user?.id
+        }));
+      });
+    },
+    // This method will be called when a new message is sent
+    onSubmit(event, text) {
+      event.preventDefault();
+
+      sendMessage({
+        text,
+        uid: this.user?.id,
+        author: this.user?.name
+      });
+    }
+  },
+  data: () => ({
+    user: undefined,
+    messages: []
+  })
+}
+</script>
+
 <template>
-  <header>
-  <h1>Vue Js Chat Application</h1>    
+  <div class='app'>
+    <div class='messages'>
+      <Message
+          v-for='message in messages'
+          :key='message.id'
+          :class='["message", { right: message.isMine }]'
+          :dark='message.isMine'
+          :text='message.text'
+          :author='message.author'
+      />
+    </div>
 
-  </header>
+    <ChatBox
+        class='chat-box'
+        @submit='onSubmit'
+    />
 
-  <main>
-    <TheWelcome />
-     <!-- adding the DeadSimpleChat Embed code to add chat room to Vue App-->
-      <iframe src="https://deadsimplechat.com/6BfOlm8J6" width="100%" height="600px"></iframe>
-  </main>
+    <RegisterDialog
+        v-if='!user'
+        @submit='onRegister'
+    />
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<style>
+@font-face {
+  font-family: 'Georama';
+  src: url('./assets/Georama.ttf');
 }
 
+@font-face {
+  font-family: 'Georama';
+  src: url('./assets/Georama.ttf');
+  font-weight: bold;
+}
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+* {
+  box-sizing: border-box;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+html {
+  font-family: 'Georama', sans-serif;
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+body {
+  margin: 0;
+}
+
+button {
+  border: 0;
+  background: #2a60ff;
+  color: white;
+  cursor: pointer;
+  padding: 1rem;
+}
+
+input {
+  border: 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<style scoped>
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  flex-grow: 1;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.message + .message {
+  margin-top: 1rem;
+}
+
+.message.right {
+  margin-left: auto;
 }
 </style>
