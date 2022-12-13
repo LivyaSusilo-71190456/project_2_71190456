@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'Message',
+  name: 'message',
   props: [
     'text', // Content of the message
     'author', // Author of the message

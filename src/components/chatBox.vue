@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'ChatBox',
+  name: 'chatBox',
   data: () => ({
 
     // To keep the state of the input content
